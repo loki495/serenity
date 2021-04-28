@@ -90,16 +90,25 @@ void BoardWidget::toggle_cell(size_t index) {
 }
 
 int BoardWidget::get_cell_size() {
-    [[ maybe_unused ]]float width = rect().width() / m_board->columns();
-    [[ maybe_unused ]]float height = rect().height() / m_board->rows();
+    int width = rect().width() / m_board->columns();
+    int height = rect().height() / m_board->rows();
 
-    int size = (int)width;
+    int size = width;
 
-    if (rect().width() > rect().height()) {
-        size = (int)height;
+    if (width > height) {
+        size = height;
     }
 
     return size;
+}
+
+Gfx::IntSize BoardWidget::get_board_offset()
+{
+    int cell_size = get_cell_size();
+    return {
+        (width() - cell_size * m_board->columns()) / 2,
+        (height() - cell_size * m_board->rows()) / 2,
+    };
 }
 
 void BoardWidget::paint_event(GUI::PaintEvent& event)
@@ -108,15 +117,15 @@ void BoardWidget::paint_event(GUI::PaintEvent& event)
 
     GUI::Painter painter(*this);
     painter.add_clip_rect(event.rect());
+    painter.fill_rect(event.rect(), Color::Black);
 
     int cell_size = get_cell_size();
-
-    printf("board: %dx%d - cell: %d\n",rect().width(), rect().height(), cell_size);
+    Gfx::IntSize board_offset = get_board_offset();
 
     for (size_t row = 0; row < m_board->rows(); ++row) {
         for (size_t column = 0; column < m_board->columns(); ++column) {
-            int cell_x = column * cell_size;
-            int cell_y = row * cell_size;
+            int cell_x = column * cell_size + board_offset.width();
+            int cell_y = row * cell_size + board_offset.height();
 
             Gfx::Rect cell_rect(cell_x, cell_y, cell_size, cell_size);
 
@@ -159,5 +168,6 @@ void BoardWidget::mouseup_event(GUI::MouseEvent&)
 
 size_t BoardWidget::get_index_for_point(int x, int y) {
     int cell_size = get_cell_size();
-    return m_board->columns() * (y / cell_size) + x / cell_size;
+    Gfx::IntSize board_offset = get_board_offset();
+    return m_board->columns() * ((y - board_offset.height()) / cell_size) + (x - board_offset.width()) / cell_size;
 }

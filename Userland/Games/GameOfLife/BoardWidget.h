@@ -26,6 +26,7 @@ public:
     void randomize_cells() { m_board->randomize(); }
 
     int get_cell_size();
+    Gfx::IntSize get_board_offset();
 
     void update_board(int columns, int rows);
     Board* board() const { return m_board; }
