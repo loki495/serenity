@@ -11,26 +11,12 @@ class BoardWidget final : public GUI::Widget {
 
 public:
 
-    class Cell final : public GUI::Label {
-        C_OBJECT(Cell);
-    public:
-        explicit Cell(BoardWidget*, size_t index);
+    virtual void paint_event(GUI::PaintEvent&) override;
+    virtual void mousemove_event(GUI::MouseEvent&) override;
+    virtual void mouseup_event(GUI::MouseEvent&) override;
+    virtual void mousedown_event(GUI::MouseEvent& event) override;
 
-        size_t index() const { return m_index; }
-
-        bool is_cell() const { return true; }
-
-    private:
-        GUI::MouseEvent convert_event_into_parent_coords(GUI::MouseEvent&) const;
-        virtual void paint_event(GUI::PaintEvent&) override;
-        virtual void mousedown_event(GUI::MouseEvent& event) override;
-        virtual void mousemove_event(GUI::MouseEvent& event) override;
-        virtual void mouseup_event(GUI::MouseEvent& event) override;
-
-        BoardWidget* m_board_widget;
-        size_t m_index { 0 };
-    };
-
+    size_t get_index_for_point(int x, int y);
     void set_toggling_cells(bool toggling) { m_toggling_cells = toggling; if (!toggling) m_last_cell_toggled = m_board->total_size(); }
     size_t last_toggled() { return m_last_cell_toggled; }
     bool is_toggling() { return m_toggling_cells; }
@@ -38,6 +24,8 @@ public:
     void toggle_cell(size_t index);
     void clear_cells() { m_board->clear(); }
     void randomize_cells() { m_board->randomize(); }
+
+    int get_cell_size();
 
     void update_board(int columns, int rows);
     Board* board() const { return m_board; }

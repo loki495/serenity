@@ -8,7 +8,7 @@ Board::Board(size_t columns, size_t rows)
     , m_rows(rows)
 {
 
-    m_cells = new bool[total_size()];
+    m_cells.resize(total_size());
     for (size_t i = 0; i < total_size(); ++i) {
         m_cells[i] = false;
     }
@@ -17,13 +17,12 @@ Board::Board(size_t columns, size_t rows)
 }
 
 Board::~Board() {
-    if (m_cells)
-        delete [] m_cells;
 }
 
 void Board::run_generation() {
     m_stalled = true;
-    bool* new_cells = new bool[total_size()];
+    Vector<bool> new_cells;
+    new_cells.resize(total_size());
 
     for (size_t i = 0; i < total_size(); ++i) {
         bool old_val = m_cells[i];
@@ -36,7 +35,6 @@ void Board::run_generation() {
     if (m_stalled)
         return;
 
-    delete [] m_cells;
     m_cells = new_cells;
 }
 

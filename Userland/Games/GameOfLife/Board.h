@@ -23,25 +23,25 @@ public:
        m_cells[index] = !m_cells[index];
    }
 
-   void toggle_cell(int column, int row) const {
+   void toggle_cell(int column, int row) {
        if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
            return;
 
        size_t index = calculate_index(column, row);
-       m_cells[index] = !m_cells[index];
+       set_cell(index, !m_cells[index]);
+   }
+
+   void set_cell(int column, int row, bool on) {
+       if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
+           return;
+
+       size_t index = calculate_index(column, row);
+       set_cell(index, on);
    }
 
    void set_cell(size_t index, bool on) {
        if (index > total_size() - 1)
            return;
-       m_cells[index] = on;
-   }
-
-   void set_cell(int column, int row, bool on) const {
-       if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
-           return;
-
-       size_t index = calculate_index(column, row);
        m_cells[index] = on;
    }
 
@@ -57,10 +57,10 @@ public:
            return false;
 
        size_t index = calculate_index(column, row);
-       return m_cells[index];
+       return get_cell(index);
    }
 
-   bool* cells() { return m_cells; }
+   const Vector<bool>& cells() { return m_cells; }
 
    void run_generation();
    bool is_stalled() { return m_stalled; }
@@ -84,5 +84,5 @@ private:
 
    bool m_stalled { false };
 
-   bool* m_cells;
+   Vector<bool> m_cells;
 };

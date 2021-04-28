@@ -46,27 +46,6 @@ void BoardWidget::update_board(int columns, int rows)
 
     delete m_board;
     m_board = new Board(columns, rows);
-
-    while(child_widgets().size()) {
-        auto container = child_widgets().first();
-        while(container->child_widgets().size()) {
-            auto cell = container->child_widgets().first();
-            cell->remove_from_parent();
-        };
-        container->remove_from_parent();
-    };
-
-    for (size_t row = 0; row < m_board->rows(); ++row) {
-        auto& container = add<GUI::Widget>();
-        auto& horizontal_layout = container.set_layout<GUI::HorizontalBoxLayout>();
-        horizontal_layout.set_spacing(0);
-        for (size_t column = 0; column < m_board->columns(); ++column) {
-            auto cell = Cell::construct(this, m_board->calculate_index(column,row));
-            container.add_child(cell);
-        }
-    }
-
-    update();
 }
 void BoardWidget::set_running_timer_interval(int interval) {
     if (is_running())
@@ -110,45 +89,75 @@ void BoardWidget::toggle_cell(size_t index) {
     update();
 }
 
-BoardWidget::Cell::Cell(BoardWidget* board, size_t index)
-    : GUI::Label()
-    , m_board_widget(board)
-    , m_index(index)
-{
-    set_greedy_for_hits(false);
+int BoardWidget::get_cell_size() {
+    [[ maybe_unused ]]float width = rect().width() / m_board->columns();
+    [[ maybe_unused ]]float height = rect().height() / m_board->rows();
+
+    int size = (int)width;
+
+    if (rect().width() > rect().height()) {
+        size = (int)height;
+    }
+
+    return size;
 }
 
-void BoardWidget::Cell::paint_event(GUI::PaintEvent& event)
+void BoardWidget::paint_event(GUI::PaintEvent& event)
 {
-    Frame::paint_event(event);
+    GUI::Widget::paint_event(event);
 
     GUI::Painter painter(*this);
     painter.add_clip_rect(event.rect());
 
-    Color border_color = Color::DarkGray;
-    Color fill_color;
+    int cell_size = get_cell_size();
 
-    bool on = m_board_widget->board()->get_cell(m_index);
-    if (on) {
-        fill_color = Color::from_rgb(Gfx::make_rgb(220,220,80));
-    } else {
-        fill_color = Color::MidGray;
+    printf("board: %dx%d - cell: %d\n",rect().width(), rect().height(), cell_size);
+
+    for (size_t row = 0; row < m_board->rows(); ++row) {
+        for (size_t column = 0; column < m_board->columns(); ++column) {
+            int cell_x = column * cell_size;
+            int cell_y = row * cell_size;
+
+            Gfx::Rect cell_rect(cell_x, cell_y, cell_size, cell_size);
+
+            Color border_color = Color::DarkGray;
+            Color fill_color;
+
+            bool on = m_board->get_cell(m_board->calculate_index(column, row));
+            if (on) {
+                fill_color = Color::from_rgb(Gfx::make_rgb(220,220,80));
+            } else {
+                fill_color = Color::MidGray;
+            }
+
+            painter.fill_rect(cell_rect, fill_color);
+            painter.draw_rect(cell_rect, border_color);
+        }
     }
-
-    painter.fill_rect(rect(), fill_color);
-    painter.draw_rect(rect(), border_color);
 }
 
-void BoardWidget::Cell::mousedown_event(GUI::MouseEvent&) {
-    m_board_widget->set_toggling_cells(true);
-    m_board_widget->toggle_cell(m_index);
+void BoardWidget::mousedown_event(GUI::MouseEvent& event)
+{
+    size_t index = get_index_for_point(event.x(), event.y());
+    set_toggling_cells(true);
+    toggle_cell(index);
 }
-void BoardWidget::Cell::mousemove_event(GUI::MouseEvent&)  {
-    if (m_board_widget->is_toggling()) {
-        if (m_board_widget->last_toggled() != m_index)
-            m_board_widget->toggle_cell(m_index);
+
+void BoardWidget::mousemove_event(GUI::MouseEvent& event)
+{
+    size_t index = get_index_for_point(event.x(), event.y());
+    if (is_toggling()) {
+        if (last_toggled() != index)
+            toggle_cell(index);
     }
 }
-void BoardWidget::Cell::mouseup_event(GUI::MouseEvent&) {
-    m_board_widget->set_toggling_cells(false);
+
+void BoardWidget::mouseup_event(GUI::MouseEvent&)
+{
+    set_toggling_cells(false);
+}
+
+size_t BoardWidget::get_index_for_point(int x, int y) {
+    int cell_size = get_cell_size();
+    return m_board->columns() * (y / cell_size) + x / cell_size;
 }
