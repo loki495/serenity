@@ -1,36 +1,37 @@
-// TODO:
-// - resize window on cell resize
-// - mousemove over multiple cell
-
+/*
+ * Copyright (c) 2021, Andres Crucitti <dasc495@gmail.com>
+ *
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+#include "BoardWidget.h"
+#include <Games/GameOfLife/GameOfLifeGML.h>
 #include <LibGUI/Application.h>
-#include <LibGUI/Button.h>
 #include <LibGUI/BoxLayout.h>
-#include <LibGUI/MessageBox.h>
+#include <LibGUI/Button.h>
+#include <LibGUI/Icon.h>
+#include <LibGUI/Label.h>
 #include <LibGUI/Menu.h>
-#include <LibGUI/MenuBar.h>
-#include <LibGUI/StatusBar.h>
+#include <LibGUI/Menubar.h>
+#include <LibGUI/MessageBox.h>
+#include <LibGUI/Slider.h>
 #include <LibGUI/SpinBox.h>
+#include <LibGUI/Statusbar.h>
 #include <LibGUI/Toolbar.h>
 #include <LibGUI/ToolbarContainer.h>
 #include <LibGUI/Window.h>
-#include <LibGUI/Slider.h>
-#include <Games/GameOfLife/GameOfLifeGML.h>
-#include <LibCore/ConfigFile.h>
-#include "BoardWidget.h"
 
-#define DBG \
-    dbg() << "File: " << __FILE__ << " - Line: " << __LINE__
+const char* click_tip = "Tip: click the board to toggle individual cells, or click+drag to toggle multiple cells";
 
-int main(int argc, char** argv) {
-
-    auto config = Core::ConfigFile::get_for_app("GameOfLife");
+int main(int argc, char** argv)
+{
 
     auto app = GUI::Application::construct(argc, argv);
+    auto app_icon = GUI::Icon::default_icon("app-gameoflife");
 
     auto window = GUI::Window::construct();
 
-    [[ maybe_unused ]] size_t board_cells_x = 20;
-    [[ maybe_unused ]] size_t board_cells_y = 20;
+    size_t board_cells_x = 35;
+    size_t board_cells_y = 35;
 
     window->set_double_buffering_enabled(false);
     window->set_title("Game Of Life");
@@ -41,17 +42,14 @@ int main(int argc, char** argv) {
 
     auto& main_toolbar = *main_widget.find_descendant_of_type_named<GUI::Toolbar>("toolbar");
 
-    RefPtr<GUI::Label> stalled_label = GUI::Label::construct();
-    stalled_label->set_visible(false);
-    stalled_label->set_text("Stalled...");
-    stalled_label->set_text_alignment(Gfx::TextAlignment::CenterLeft);
-
     auto& board_widget_container = *main_widget.find_descendant_of_type_named<GUI::Widget>("board_widget_container");
     auto& board_layout = board_widget_container.set_layout<GUI::VerticalBoxLayout>();
     board_layout.set_spacing(0);
     auto& board_widget = board_widget_container.add<BoardWidget>(board_cells_x, board_cells_y);
+    board_widget.randomize_cells();
 
     auto& statusbar = *main_widget.find_descendant_of_type_named<GUI::Statusbar>("statusbar");
+    statusbar.set_text(click_tip);
 
     auto& columns_spinbox = *main_widget.find_descendant_of_type_named<GUI::SpinBox>("columns_spinbox");
     auto& rows_spinbox = *main_widget.find_descendant_of_type_named<GUI::SpinBox>("rows_spinbox");
@@ -60,15 +58,18 @@ int main(int argc, char** argv) {
     rows_spinbox.set_value(board_cells_y);
 
     auto size_changed_function = [&] {
+        statusbar.set_text(click_tip);
         board_widget.update_board(columns_spinbox.value(), rows_spinbox.value());
+        board_widget.randomize_cells();
+        board_widget.update();
     };
 
-    rows_spinbox.on_change = [&] (auto) { size_changed_function(); };
-    columns_spinbox.on_change = [&] (auto) { size_changed_function(); };
+    rows_spinbox.on_change = [&](auto) { size_changed_function(); };
+    columns_spinbox.on_change = [&](auto) { size_changed_function(); };
 
     auto& interval_spinbox = *main_widget.find_descendant_of_type_named<GUI::SpinBox>("interval_spinbox");
 
-    interval_spinbox.on_change = [&] (auto value) {
+    interval_spinbox.on_change = [&](auto value) {
         board_widget.set_running_timer_interval(value);
     };
 
@@ -83,26 +84,28 @@ int main(int argc, char** argv) {
     auto paused_icon = Gfx::Bitmap::load_from_file("/res/icons/16x16/pause.png");
     auto play_icon = Gfx::Bitmap::load_from_file("/res/icons/16x16/play.png");
 
-    auto toggle_running_action = GUI::Action::create("Toggle Running", { Mod_None, Key_Return }, *play_icon,  [&](GUI::Action&) {
+    auto toggle_running_action = GUI::Action::create("Toggle Running", { Mod_None, Key_Return }, *play_icon, [&](GUI::Action&) {
         board_widget.set_running(!board_widget.is_running());
     });
+
     toggle_running_action->set_checkable(true);
     main_toolbar.add_action(toggle_running_action);
 
     auto run_one_generation_action = GUI::Action::create("Run Next Generation", { Mod_Ctrl, Key_Equal }, Gfx::Bitmap::load_from_file("/res/icons/16x16/go-forward.png"), [&](const GUI::Action&) {
+        statusbar.set_text(click_tip);
         board_widget.run_generation();
     });
     main_toolbar.add_action(run_one_generation_action);
 
-    auto clear_board_action = GUI::Action::create("Clear board", { Mod_Ctrl, Key_N},Gfx::Bitmap::load_from_file("/res/icons/16x16/delete.png"),  [&](auto&) {
-        statusbar.set_text("Board Cleared...");
+    auto clear_board_action = GUI::Action::create("Clear board", { Mod_Ctrl, Key_N }, Gfx::Bitmap::load_from_file("/res/icons/16x16/delete.png"), [&](auto&) {
+        statusbar.set_text(click_tip);
         board_widget.clear_cells();
         board_widget.update();
     });
     main_toolbar.add_action(clear_board_action);
 
     auto randomize_cells_action = GUI::Action::create("Randomize board", { Mod_Ctrl, Key_R }, Gfx::Bitmap::load_from_file("/res/icons/16x16/reload.png"), [&](auto&) {
-        statusbar.set_text("Cells randomized...");
+        statusbar.set_text(click_tip);
         board_widget.randomize_cells();
         board_widget.update();
     });
@@ -126,14 +129,14 @@ int main(int argc, char** argv) {
 
     window->set_menubar(move(menubar));
 
-    board_widget.on_running_state_change = [&] () {
+    board_widget.on_running_state_change = [&]() {
         if (board_widget.is_running()) {
             statusbar.set_text("Running...");
-            toggle_running_action->set_icon(play_icon);
+            toggle_running_action->set_icon(paused_icon);
             main_widget.set_override_cursor(Gfx::StandardCursor::None);
         } else {
-            statusbar.set_text("");
-            toggle_running_action->set_icon(paused_icon);
+            statusbar.set_text(click_tip);
+            toggle_running_action->set_icon(play_icon);
             main_widget.set_override_cursor(Gfx::StandardCursor::Drag);
         }
 
@@ -155,15 +158,12 @@ int main(int argc, char** argv) {
         statusbar.set_text("Stalled...");
     };
 
-    board_widget.on_cell_toggled = [&] (auto, auto) {
-        statusbar.set_text("");
+    board_widget.on_cell_toggled = [&](auto, auto) {
+        statusbar.set_text(click_tip);
     };
 
-    window->resize(400, 440);
-    window->set_resize_aspect_ratio(1, 1);
+    window->resize(500, 420);
     window->show();
-
-    //window->set_icon(Gfx::Bitmap::load_from_file("/res/icons/16x16/.png"));
 
     return app->exec();
 }

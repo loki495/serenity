@@ -1,7 +1,10 @@
-#include <time.h>
-#include <AK/String.h>
-#include <AK/Vector.h>
+/*
+ * Copyright (c) 2021, Andres Crucitti <dasc495@gmail.com>
+ *
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
 #include "Board.h"
+#include <time.h>
 
 Board::Board(size_t columns, size_t rows)
     : m_columns(columns)
@@ -16,10 +19,12 @@ Board::Board(size_t columns, size_t rows)
     srand(time(0));
 }
 
-Board::~Board() {
+Board::~Board()
+{
 }
 
-void Board::run_generation() {
+void Board::run_generation()
+{
     m_stalled = true;
     Vector<bool> new_cells;
     new_cells.resize(total_size());
@@ -38,17 +43,18 @@ void Board::run_generation() {
     m_cells = new_cells;
 }
 
-bool Board::calculate_next_value(int index) {
+bool Board::calculate_next_value(int index)
+{
     int row = index / columns();
     int column = index % columns();
 
-    int top_left     = get_cell(column - 1, row - 1) ? 1 : 0;
-    int top_mid      = get_cell(column    , row - 1) ? 1 : 0;
-    int top_right    = get_cell(column + 1, row - 1) ? 1 : 0;
-    int left         = get_cell(column - 1, row    ) ? 1 : 0;
-    int right        = get_cell(column + 1, row    ) ? 1 : 0;
-    int bottom_left  = get_cell(column - 1, row + 1) ? 1 : 0;
-    int bottom_mid   = get_cell(column    , row + 1) ? 1 : 0;
+    int top_left = get_cell(column - 1, row - 1) ? 1 : 0;
+    int top_mid = get_cell(column, row - 1) ? 1 : 0;
+    int top_right = get_cell(column + 1, row - 1) ? 1 : 0;
+    int left = get_cell(column - 1, row) ? 1 : 0;
+    int right = get_cell(column + 1, row) ? 1 : 0;
+    int bottom_left = get_cell(column - 1, row + 1) ? 1 : 0;
+    int bottom_mid = get_cell(column, row + 1) ? 1 : 0;
     int bottom_right = get_cell(column + 1, row + 1) ? 1 : 0;
 
     int sum = top_left + top_mid + top_right + left + right + bottom_left + bottom_mid + bottom_right;
@@ -64,17 +70,17 @@ bool Board::calculate_next_value(int index) {
             new_value = true;
     }
 
-    //dbg() << "index: " << index << "\t[" << column << "," << row << "],\told=" << current << ",\tnew=" << new_value << ",\tsum=" << sum;
-
     return new_value;
 }
 
-void Board::clear() {
+void Board::clear()
+{
     for (size_t i = 0; i < total_size(); ++i)
         set_cell(i, false);
 }
 
-void Board::randomize() {
+void Board::randomize()
+{
     for (size_t i = 0; i < total_size(); ++i)
         set_cell(i, rand() % 2);
 }

@@ -1,17 +1,13 @@
-#include <LibGfx/Bitmap.h>
-#include <LibGfx/Rect.h>
-#include <LibGUI/Action.h>
-#include <LibGUI/BoxLayout.h>
-#include <LibGUI/Label.h>
-#include <LibGUI/Painter.h>
-#include <LibGUI/SpinBox.h>
+/*
+ * Copyright (c) 2021, Andres Crucitti <dasc495@gmail.com>
+ *
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
 #include "BoardWidget.h"
+#include <LibGUI/Painter.h>
 
 BoardWidget::BoardWidget(int columns, int rows)
 {
-    auto &main_layout = set_layout<GUI::VerticalBoxLayout>();
-    main_layout.set_spacing(0);
-
     m_timer = add<Core::Timer>();
     m_timer->stop();
     m_timer->on_timeout = [this] {
@@ -22,7 +18,8 @@ BoardWidget::BoardWidget(int columns, int rows)
     update_board(columns, rows);
 }
 
-void BoardWidget::run_generation() {
+void BoardWidget::run_generation()
+{
     m_board->run_generation();
     update();
     if (m_board->is_stalled()) {
@@ -47,7 +44,9 @@ void BoardWidget::update_board(int columns, int rows)
     delete m_board;
     m_board = new Board(columns, rows);
 }
-void BoardWidget::set_running_timer_interval(int interval) {
+
+void BoardWidget::set_running_timer_interval(int interval)
+{
     if (is_running())
         return;
 
@@ -58,7 +57,8 @@ void BoardWidget::set_running_timer_interval(int interval) {
         on_running_state_change();
 }
 
-void BoardWidget::set_running(bool r) {
+void BoardWidget::set_running(bool r)
+{
     if (r == m_running)
         return;
 
@@ -71,12 +71,13 @@ void BoardWidget::set_running(bool r) {
     }
 
     if (on_running_state_change)
-         on_running_state_change();
+        on_running_state_change();
 
     update();
 }
 
-void BoardWidget::toggle_cell(size_t index) {
+void BoardWidget::toggle_cell(size_t index)
+{
     if (m_running || !m_toggling_cells || m_last_cell_toggled == index)
         return;
 
@@ -89,7 +90,8 @@ void BoardWidget::toggle_cell(size_t index) {
     update();
 }
 
-int BoardWidget::get_cell_size() {
+int BoardWidget::get_cell_size()
+{
     int width = rect().width() / m_board->columns();
     int height = rect().height() / m_board->rows();
 
@@ -134,13 +136,15 @@ void BoardWidget::paint_event(GUI::PaintEvent& event)
 
             bool on = m_board->get_cell(m_board->calculate_index(column, row));
             if (on) {
-                fill_color = Color::from_rgb(Gfx::make_rgb(220,220,80));
+                fill_color = Color::from_rgb(Gfx::make_rgb(220, 220, 80));
             } else {
                 fill_color = Color::MidGray;
             }
 
             painter.fill_rect(cell_rect, fill_color);
-            painter.draw_rect(cell_rect, border_color);
+            if (cell_size > 4) {
+                painter.draw_rect(cell_rect, border_color);
+            }
         }
     }
 }
@@ -166,7 +170,8 @@ void BoardWidget::mouseup_event(GUI::MouseEvent&)
     set_toggling_cells(false);
 }
 
-size_t BoardWidget::get_index_for_point(int x, int y) {
+size_t BoardWidget::get_index_for_point(int x, int y)
+{
     int cell_size = get_cell_size();
     Gfx::IntSize board_offset = get_board_offset();
     return m_board->columns() * ((y - board_offset.height()) / cell_size) + (x - board_offset.width()) / cell_size;

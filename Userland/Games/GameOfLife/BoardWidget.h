@@ -1,23 +1,30 @@
+/*
+ * Copyright (c) 2021, Andres Crucitti <dasc495@gmail.com>
+ *
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
 #pragma once
 
-#include <LibCore/Timer.h>
-#include <LibGUI/Label.h>
-#include <LibGUI/SpinBox.h>
-#include <AK/Vector.h>
 #include "Board.h"
+#include <LibCore/Timer.h>
+#include <LibGUI/Widget.h>
 
 class BoardWidget final : public GUI::Widget {
     C_OBJECT(BoardWidget);
 
 public:
-
     virtual void paint_event(GUI::PaintEvent&) override;
     virtual void mousemove_event(GUI::MouseEvent&) override;
     virtual void mouseup_event(GUI::MouseEvent&) override;
     virtual void mousedown_event(GUI::MouseEvent& event) override;
 
-    size_t get_index_for_point(int x, int y);
-    void set_toggling_cells(bool toggling) { m_toggling_cells = toggling; if (!toggling) m_last_cell_toggled = m_board->total_size(); }
+    void set_toggling_cells(bool toggling)
+    {
+        m_toggling_cells = toggling;
+        if (!toggling)
+            m_last_cell_toggled = m_board->total_size();
+    }
+
     size_t last_toggled() { return m_last_cell_toggled; }
     bool is_toggling() { return m_toggling_cells; }
 
@@ -27,6 +34,8 @@ public:
 
     int get_cell_size();
     Gfx::IntSize get_board_offset();
+
+    size_t get_index_for_point(int x, int y);
 
     void update_board(int columns, int rows);
     Board* board() const { return m_board; }
@@ -43,7 +52,7 @@ public:
 
     Function<void()> on_running_state_change;
     Function<void()> on_stall;
-    Function<void(Board *, size_t)> on_cell_toggled;
+    Function<void(Board*, size_t)> on_cell_toggled;
 
 private:
     BoardWidget(int columns, int rows);
