@@ -134,7 +134,7 @@ void BoardWidget::paint_event(GUI::PaintEvent& event)
             Color border_color = Color::DarkGray;
             Color fill_color;
 
-            bool on = m_board->get_cell(m_board->calculate_index(column, row));
+            bool on = m_board->get_cell(column, row);
             if (on) {
                 fill_color = Color::from_rgb(Gfx::make_rgb(220, 220, 80));
             } else {

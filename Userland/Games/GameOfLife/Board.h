@@ -20,68 +20,19 @@ public:
 
     size_t calculate_index(int column, int row) const { return row * m_columns + column; };
 
-    void toggle_cell(size_t index)
-    {
-        if (index > total_size() - 1)
-            return;
+    void toggle_cell(size_t index);
+    void toggle_cell(int column, int row);
 
-        m_cells[index] = !m_cells[index];
-    }
+    void set_cell(int column, int row, bool on);
+    void set_cell(size_t index, bool on);
 
-    void toggle_cell(int column, int row)
-    {
-        if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
-            return;
-
-        size_t index = calculate_index(column, row);
-        set_cell(index, !m_cells[index]);
-    }
-
-    void set_cell(int column, int row, bool on)
-    {
-        if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
-            return;
-
-        size_t index = calculate_index(column, row);
-        set_cell(index, on);
-    }
-
-    void set_cell(size_t index, bool on)
-    {
-        if (index > total_size() - 1)
-            return;
-        m_cells[index] = on;
-    }
-
-    bool get_cell(size_t index) const
-    {
-        if (index > total_size() - 1)
-            return false;
-
-        return m_cells[index];
-    }
-
-    bool get_cell(int column, int row) const
-    {
-        if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
-            return false;
-
-        size_t index = calculate_index(column, row);
-        return get_cell(index);
-    }
+    bool get_cell(int column, int row) const;
+    bool get_cell(size_t index) const;
 
     const Vector<bool>& cells() { return m_cells; }
 
     void run_generation();
     bool is_stalled() { return m_stalled; }
-
-    Gfx::IntPoint index_to_col_row(size_t index)
-    {
-        if (index > total_size() - 1)
-            return { -1, -1 };
-
-        return { index % m_columns, index / m_columns };
-    }
 
     void clear();
     void randomize();
