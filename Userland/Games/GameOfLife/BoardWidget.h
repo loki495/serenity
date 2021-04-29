@@ -37,7 +37,7 @@ public:
 
     size_t get_index_for_point(int x, int y);
 
-    void update_board(int columns, int rows);
+    void update_board(size_t columns, size_t rows);
     Board* board() const { return m_board; }
 
     bool is_running() const { return m_running; }
@@ -55,7 +55,7 @@ public:
     Function<void(Board*, size_t)> on_cell_toggled;
 
 private:
-    BoardWidget(int columns, int rows);
+    BoardWidget(size_t columns, size_t rows);
 
     bool m_toggling_cells { false };
     size_t m_last_cell_toggled { 0 };

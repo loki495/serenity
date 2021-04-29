@@ -18,15 +18,15 @@ public:
     size_t columns() const { return m_columns; }
     size_t rows() const { return m_rows; }
 
-    size_t calculate_index(int column, int row) const { return row * m_columns + column; };
+    size_t calculate_index(size_t column, size_t row) const { return row * m_columns + column; };
 
     void toggle_cell(size_t index);
-    void toggle_cell(int column, int row);
+    void toggle_cell(size_t column, size_t row);
 
-    void set_cell(int column, int row, bool on);
+    void set_cell(size_t column, size_t row, bool on);
     void set_cell(size_t index, bool on);
 
-    bool get_cell(int column, int row) const;
+    bool get_cell(size_t column, size_t row) const;
     bool get_cell(size_t index) const;
 
     const Vector<bool>& cells() { return m_cells; }
@@ -38,7 +38,7 @@ public:
     void randomize();
 
 private:
-    bool calculate_next_value(int);
+    bool calculate_next_value(size_t index);
 
     size_t m_columns;
     size_t m_rows;

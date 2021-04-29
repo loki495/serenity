@@ -30,8 +30,8 @@ int main(int argc, char** argv)
 
     auto window = GUI::Window::construct();
 
-    size_t board_cells_x = 35;
-    size_t board_cells_y = 35;
+    size_t board_columns = 35;
+    size_t board_rows = 35;
 
     window->set_double_buffering_enabled(false);
     window->set_title("Game Of Life");
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     auto& board_widget_container = *main_widget.find_descendant_of_type_named<GUI::Widget>("board_widget_container");
     auto& board_layout = board_widget_container.set_layout<GUI::VerticalBoxLayout>();
     board_layout.set_spacing(0);
-    auto& board_widget = board_widget_container.add<BoardWidget>(board_cells_x, board_cells_y);
+    auto& board_widget = board_widget_container.add<BoardWidget>(board_columns, board_rows);
     board_widget.randomize_cells();
 
     auto& statusbar = *main_widget.find_descendant_of_type_named<GUI::Statusbar>("statusbar");
@@ -54,8 +54,8 @@ int main(int argc, char** argv)
     auto& columns_spinbox = *main_widget.find_descendant_of_type_named<GUI::SpinBox>("columns_spinbox");
     auto& rows_spinbox = *main_widget.find_descendant_of_type_named<GUI::SpinBox>("rows_spinbox");
 
-    columns_spinbox.set_value(board_cells_x);
-    rows_spinbox.set_value(board_cells_y);
+    columns_spinbox.set_value(board_columns);
+    rows_spinbox.set_value(board_rows);
 
     auto size_changed_function = [&] {
         statusbar.set_text(click_tip);

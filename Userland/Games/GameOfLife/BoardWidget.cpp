@@ -6,7 +6,7 @@
 #include "BoardWidget.h"
 #include <LibGUI/Painter.h>
 
-BoardWidget::BoardWidget(int columns, int rows)
+BoardWidget::BoardWidget(size_t columns, size_t rows)
 {
     m_timer = add<Core::Timer>();
     m_timer->stop();
@@ -29,14 +29,14 @@ void BoardWidget::run_generation()
     };
 }
 
-void BoardWidget::update_board(int columns, int rows)
+void BoardWidget::update_board(size_t columns, size_t rows)
 {
     set_running(false);
 
     m_last_cell_toggled = columns * rows;
 
     if (m_board) {
-        if (columns == (int)m_board->columns() && rows == (int)m_board->rows()) {
+        if (columns == m_board->columns() && rows == m_board->rows()) {
             return;
         }
     }

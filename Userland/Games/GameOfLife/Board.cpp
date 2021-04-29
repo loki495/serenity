@@ -42,10 +42,10 @@ void Board::run_generation()
     m_cells = new_cells;
 }
 
-bool Board::calculate_next_value(int index)
+bool Board::calculate_next_value(size_t index)
 {
-    int row = index / columns();
-    int column = index % columns();
+    size_t row = index / columns();
+    size_t column = index % columns();
 
     int top_left = get_cell(column - 1, row - 1);
     int top_mid = get_cell(column, row - 1);
@@ -92,9 +92,9 @@ void Board::toggle_cell(size_t index)
     m_cells[index] = !m_cells[index];
 }
 
-void Board::toggle_cell(int column, int row)
+void Board::toggle_cell(size_t column, size_t row)
 {
-    if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
+    if (column > total_size() - 1 || row > total_size() - 1)
         return;
 
     size_t index = calculate_index(column, row);
@@ -108,9 +108,9 @@ void Board::set_cell(size_t index, bool on)
     m_cells[index] = on;
 }
 
-void Board::set_cell(int column, int row, bool on)
+void Board::set_cell(size_t column, size_t row, bool on)
 {
-    if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
+    if (column > total_size() - 1 || row > total_size() - 1)
         return;
 
     size_t index = calculate_index(column, row);
@@ -125,9 +125,9 @@ bool Board::get_cell(size_t index) const
     return m_cells[index];
 }
 
-bool Board::get_cell(int column, int row) const
+bool Board::get_cell(size_t column, size_t row) const
 {
-    if (column < 0 || column > (int)total_size() - 1 || row < 0 || row > (int)total_size() - 1)
+    if (column > total_size() - 1 || row > total_size() - 1)
         return false;
 
     size_t index = calculate_index(column, row);
