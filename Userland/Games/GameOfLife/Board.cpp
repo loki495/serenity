@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 #include "Board.h"
+#include <AK/Random.h>
 #include <time.h>
 
 Board::Board(size_t columns, size_t rows)
@@ -15,8 +16,6 @@ Board::Board(size_t columns, size_t rows)
     for (size_t i = 0; i < total_size(); ++i) {
         m_cells[i] = false;
     }
-
-    srand(time(0));
 }
 
 Board::~Board()
@@ -82,5 +81,5 @@ void Board::clear()
 void Board::randomize()
 {
     for (size_t i = 0; i < total_size(); ++i)
-        set_cell(i, rand() % 2);
+        set_cell(i, get_random<u32>() % 2);
 }
