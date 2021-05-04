@@ -17,7 +17,7 @@ public:
     virtual void paint_event(GUI::PaintEvent&) override;
     virtual void mousemove_event(GUI::MouseEvent&) override;
     virtual void mouseup_event(GUI::MouseEvent&) override;
-    virtual void mousedown_event(GUI::MouseEvent& event) override;
+    virtual void mousedown_event(GUI::MouseEvent&) override;
 
     void set_toggling_cells(bool toggling)
     {
@@ -26,20 +26,20 @@ public:
             m_last_cell_toggled = m_board->total_size();
     }
 
-    size_t last_toggled() { return m_last_cell_toggled; }
-    bool is_toggling() { return m_toggling_cells; }
+    size_t last_toggled() const { return m_last_cell_toggled; }
+    bool is_toggling() const { return m_toggling_cells; }
 
     void toggle_cell(size_t index);
     void clear_cells() { m_board->clear(); }
     void randomize_cells() { m_board->randomize(); }
 
-    int get_cell_size();
-    Gfx::IntSize get_board_offset();
+    int get_cell_size() const;
+    Gfx::IntSize get_board_offset() const;
 
-    size_t get_index_for_point(int x, int y);
+    size_t get_index_for_point(int x, int y) const;
 
-    void update_board(size_t columns, size_t rows);
-    Board* board() const { return m_board; }
+    void update_board(size_t rows, size_t columns);
+    const Board* board() const { return m_board.ptr(); }
 
     bool is_running() const { return m_running; }
     void set_running(bool r);
@@ -48,7 +48,7 @@ public:
 
     void run_generation();
 
-    int running_timer_interval() { return m_running_timer_interval; }
+    int running_timer_interval() const { return m_running_timer_interval; }
     void set_running_timer_interval(int interval);
 
     Function<void()> on_running_state_change;
@@ -56,12 +56,12 @@ public:
     Function<void(Board*, size_t)> on_cell_toggled;
 
 private:
-    BoardWidget(size_t columns, size_t rows);
+    BoardWidget(size_t rows, size_t columns);
 
     bool m_toggling_cells { false };
     size_t m_last_cell_toggled { 0 };
 
-    Board* m_board { nullptr };
+    OwnPtr<Board> m_board { nullptr };
 
     bool m_running { false };
 

@@ -6,7 +6,7 @@
 #include "BoardWidget.h"
 #include <LibGUI/Painter.h>
 
-BoardWidget::BoardWidget(size_t columns, size_t rows)
+BoardWidget::BoardWidget(size_t rows, size_t columns)
 {
     m_timer = add<Core::Timer>();
     m_timer->stop();
@@ -15,7 +15,7 @@ BoardWidget::BoardWidget(size_t columns, size_t rows)
     };
     m_timer->set_interval(m_running_timer_interval);
 
-    update_board(columns, rows);
+    update_board(rows, columns);
 }
 
 void BoardWidget::run_generation()
@@ -29,7 +29,7 @@ void BoardWidget::run_generation()
     };
 }
 
-void BoardWidget::update_board(size_t columns, size_t rows)
+void BoardWidget::update_board(size_t rows, size_t columns)
 {
     set_running(false);
 
@@ -41,8 +41,7 @@ void BoardWidget::update_board(size_t columns, size_t rows)
         }
     }
 
-    delete m_board;
-    m_board = new Board(columns, rows);
+    m_board = make<Board>(rows, columns);
 }
 
 void BoardWidget::set_running_timer_interval(int interval)
@@ -90,7 +89,7 @@ void BoardWidget::toggle_cell(size_t index)
     update();
 }
 
-int BoardWidget::get_cell_size()
+int BoardWidget::get_cell_size() const
 {
     int width = rect().width() / m_board->columns();
     int height = rect().height() / m_board->rows();
@@ -104,7 +103,7 @@ int BoardWidget::get_cell_size()
     return size;
 }
 
-Gfx::IntSize BoardWidget::get_board_offset()
+Gfx::IntSize BoardWidget::get_board_offset() const
 {
     int cell_size = get_cell_size();
     return {
@@ -134,7 +133,7 @@ void BoardWidget::paint_event(GUI::PaintEvent& event)
             Color border_color = Color::DarkGray;
             Color fill_color;
 
-            bool on = m_board->get_cell(column, row);
+            bool on = m_board->cell(row, column);
             if (on) {
                 fill_color = Color::from_rgb(Gfx::make_rgb(220, 220, 80));
             } else {
@@ -170,7 +169,7 @@ void BoardWidget::mouseup_event(GUI::MouseEvent&)
     set_toggling_cells(false);
 }
 
-size_t BoardWidget::get_index_for_point(int x, int y)
+size_t BoardWidget::get_index_for_point(int x, int y) const
 {
     int cell_size = get_cell_size();
     Gfx::IntSize board_offset = get_board_offset();

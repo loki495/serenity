@@ -24,7 +24,6 @@ const char* click_tip = "Tip: click the board to toggle individual cells, or cli
 
 int main(int argc, char** argv)
 {
-
     auto app = GUI::Application::construct(argc, argv);
     auto app_icon = GUI::Icon::default_icon("app-gameoflife");
 
@@ -45,7 +44,7 @@ int main(int argc, char** argv)
     auto& board_widget_container = *main_widget.find_descendant_of_type_named<GUI::Widget>("board_widget_container");
     auto& board_layout = board_widget_container.set_layout<GUI::VerticalBoxLayout>();
     board_layout.set_spacing(0);
-    auto& board_widget = board_widget_container.add<BoardWidget>(board_columns, board_rows);
+    auto& board_widget = board_widget_container.add<BoardWidget>(board_rows, board_columns);
     board_widget.randomize_cells();
 
     auto& statusbar = *main_widget.find_descendant_of_type_named<GUI::Statusbar>("statusbar");
@@ -59,7 +58,7 @@ int main(int argc, char** argv)
 
     auto size_changed_function = [&] {
         statusbar.set_text(click_tip);
-        board_widget.update_board(columns_spinbox.value(), rows_spinbox.value());
+        board_widget.update_board(rows_spinbox.value(), columns_spinbox.value());
         board_widget.randomize_cells();
         board_widget.update();
     };
