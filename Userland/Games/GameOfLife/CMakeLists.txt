@@ -7,5 +7,5 @@ set(SOURCES
     main.cpp
 )
 
-serenity_bin(GameOfLife)
+serenity_app(GameOfLife ICON app-gameoflife)
 target_link_libraries(GameOfLife LibGUI)

@@ -28,6 +28,7 @@ int main(int argc, char** argv)
     auto app_icon = GUI::Icon::default_icon("app-gameoflife");
 
     auto window = GUI::Window::construct();
+    window->set_icon(app_icon.bitmap_for_size(16));
 
     size_t board_columns = 35;
     size_t board_rows = 35;
