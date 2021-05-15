@@ -85,27 +85,27 @@ int main(int argc, char** argv)
     auto paused_icon = Gfx::Bitmap::load_from_file("/res/icons/16x16/pause.png");
     auto play_icon = Gfx::Bitmap::load_from_file("/res/icons/16x16/play.png");
 
-    auto toggle_running_action = GUI::Action::create("Toggle Running", { Mod_None, Key_Return }, *play_icon, [&](GUI::Action&) {
+    auto toggle_running_action = GUI::Action::create("&Toggle Running", { Mod_None, Key_Return }, *play_icon, [&](GUI::Action&) {
         board_widget.set_running(!board_widget.is_running());
     });
 
     toggle_running_action->set_checkable(true);
     main_toolbar.add_action(toggle_running_action);
 
-    auto run_one_generation_action = GUI::Action::create("Run Next Generation", { Mod_Ctrl, Key_Equal }, Gfx::Bitmap::load_from_file("/res/icons/16x16/go-forward.png"), [&](const GUI::Action&) {
+    auto run_one_generation_action = GUI::Action::create("Run &Next Generation", { Mod_Ctrl, Key_Equal }, Gfx::Bitmap::load_from_file("/res/icons/16x16/go-forward.png"), [&](const GUI::Action&) {
         statusbar.set_text(click_tip);
         board_widget.run_generation();
     });
     main_toolbar.add_action(run_one_generation_action);
 
-    auto clear_board_action = GUI::Action::create("Clear board", { Mod_Ctrl, Key_N }, Gfx::Bitmap::load_from_file("/res/icons/16x16/delete.png"), [&](auto&) {
+    auto clear_board_action = GUI::Action::create("&Clear board", { Mod_Ctrl, Key_N }, Gfx::Bitmap::load_from_file("/res/icons/16x16/delete.png"), [&](auto&) {
         statusbar.set_text(click_tip);
         board_widget.clear_cells();
         board_widget.update();
     });
     main_toolbar.add_action(clear_board_action);
 
-    auto randomize_cells_action = GUI::Action::create("Randomize board", { Mod_Ctrl, Key_R }, Gfx::Bitmap::load_from_file("/res/icons/16x16/reload.png"), [&](auto&) {
+    auto randomize_cells_action = GUI::Action::create("&Randomize board", { Mod_Ctrl, Key_R }, Gfx::Bitmap::load_from_file("/res/icons/16x16/reload.png"), [&](auto&) {
         statusbar.set_text(click_tip);
         board_widget.randomize_cells();
         board_widget.update();
@@ -113,20 +113,20 @@ int main(int argc, char** argv)
     main_toolbar.add_action(randomize_cells_action);
 
     auto menubar = GUI::Menubar::construct();
-    auto& app_menu = menubar->add_menu("Game Of Life");
+    auto& game_menu = menubar->add_menu("&Game");
 
-    app_menu.add_action(clear_board_action);
-    app_menu.add_action(randomize_cells_action);
-    app_menu.add_separator();
-    app_menu.add_action(toggle_running_action);
-    app_menu.add_action(run_one_generation_action);
-
-    app_menu.add_action(GUI::CommonActions::make_quit_action([](auto&) {
+    game_menu.add_action(clear_board_action);
+    game_menu.add_action(randomize_cells_action);
+    game_menu.add_separator();
+    game_menu.add_action(toggle_running_action);
+    game_menu.add_action(run_one_generation_action);
+    game_menu.add_separator();
+    game_menu.add_action(GUI::CommonActions::make_quit_action([](auto&) {
         GUI::Application::the()->quit();
     }));
 
-    auto& help_menu = menubar->add_menu("Help");
-    help_menu.add_action(GUI::CommonActions::make_about_action("GameOfLife", app_icon, window));
+    auto& help_menu = menubar->add_menu("&Help");
+    help_menu.add_action(GUI::CommonActions::make_about_action("Game Of Life", app_icon, window));
 
     window->set_menubar(move(menubar));
 
