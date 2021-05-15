@@ -3,6 +3,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
+
 #include "BoardWidget.h"
 #include <Games/GameOfLife/GameOfLifeGML.h>
 #include <LibGUI/Application.h>
