@@ -56,12 +56,12 @@ void BoardWidget::set_running_timer_interval(int interval)
         on_running_state_change();
 }
 
-void BoardWidget::set_running(bool r)
+void BoardWidget::set_running(bool running)
 {
-    if (r == m_running)
+    if (running == m_running)
         return;
 
-    m_running = r;
+    m_running = running;
 
     if (m_running) {
         m_timer->start();
@@ -94,13 +94,7 @@ int BoardWidget::get_cell_size() const
     int width = rect().width() / m_board->columns();
     int height = rect().height() / m_board->rows();
 
-    int size = width;
-
-    if (width > height) {
-        size = height;
-    }
-
-    return size;
+    return min(width, height);
 }
 
 Gfx::IntSize BoardWidget::get_board_offset() const
