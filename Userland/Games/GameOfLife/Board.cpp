@@ -85,16 +85,14 @@ void Board::randomize()
 
 void Board::toggle_cell(size_t index)
 {
-    if (index > total_size() - 1)
-        return;
+    VERIFY(index < total_size());
 
     m_cells[index] = !m_cells[index];
 }
 
 void Board::toggle_cell(size_t row, size_t column)
 {
-    if (column > total_size() - 1 || row > total_size() - 1)
-        return;
+    VERIFY(column < total_size() && row < total_size());
 
     size_t index = calculate_index(row, column);
     set_cell(index, !m_cells[index]);
@@ -102,15 +100,14 @@ void Board::toggle_cell(size_t row, size_t column)
 
 void Board::set_cell(size_t index, bool on)
 {
-    if (index > total_size() - 1)
-        return;
+    VERIFY(index < total_size());
+
     m_cells[index] = on;
 }
 
 void Board::set_cell(size_t row, size_t column, bool on)
 {
-    if (column > total_size() - 1 || row > total_size() - 1)
-        return;
+    VERIFY(column < total_size() && row < total_size());
 
     size_t index = calculate_index(row, column);
     set_cell(index, on);
