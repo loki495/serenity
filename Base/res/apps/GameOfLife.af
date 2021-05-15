@@ -1,0 +1,4 @@
+[App]
+Name=GameOfLife
+Executable=/bin/GameOfLife
+Category=Games
